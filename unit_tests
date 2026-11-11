@@ -1,0 +1,87 @@
+"""Unit tests for all my functions for my Construction Project Budget Tracker."""
+
+from bakery import assert_equal
+from main import *
+
+#Helper function tests
+assert_equal(money(25.5), "$25.50")
+assert_equal(money(1000), "$1000.00")
+
+assert_equal(total_expenses([]), 0.0)
+concrete = Material(1, "Concrete", 100.0, 5.0)
+steel = Material(2, "Steel", 200.0, 2.0)
+assert_equal(total_expenses([concrete]), 500.0)
+assert_equal(total_expenses([concrete, steel]), 900.0)
+
+assert_equal(find_material([concrete, steel], 2), steel)
+assert_equal(find_material([concrete, steel], 10), None)
+
+assert_equal(valid_number("25.5", True), True)
+assert_equal(valid_number("0", True), False)
+assert_equal(valid_number("0", False), True)
+assert_equal(valid_number("-5", False), False)
+assert_equal(valid_number("hi", False), False)
+
+assert_equal(len(navigation()) > 0, True)
+
+#Page routes: calling each route should produce a Page
+#A route needs a State argument, even when it doesn't change State.
+assert_equal(isinstance(index(State()), Page), True)
+
+project = State()
+save_project(project, "UD Library", "100000")
+assert_equal(project.project_name, "UD Library")
+assert_equal(project.budget, 100000.0)
+
+assert_equal(isinstance(dashboard(project), Page), True)
+assert_equal(isinstance(add_material(project), Page), True)
+assert_equal(isinstance(summary(project), Page), True)
+
+#Adding a material
+save_material(project, "Concrete", "100", "5")
+assert_equal(len(project.materials), 1)
+assert_equal(project.materials[0].name, "Concrete")
+assert_equal(project.materials[0].unit_cost, 100.0)
+assert_equal(project.materials[0].quantity, 5.0)
+assert_equal(project.next_id, 2)
+
+#Bad input for save_material
+save_material(project, "Steel", "200", "0")
+assert_equal(len(project.materials), 1)
+
+#Editing and updating a existing material
+assert_equal(isinstance(edit_material(project, 1), Page), True)
+update_material(project, 1, "Cement", "150", "4")
+assert_equal(project.materials[0].name, "Cement")
+assert_equal(project.materials[0].unit_cost, 150.0)
+assert_equal(project.materials[0].quantity, 4.0)
+assert_equal(total_expenses(project.materials), 600.0)
+
+#Bad update
+update_material(project, 1, "Cement", "a", "4")
+assert_equal(project.materials[0].unit_cost, 150.0)
+
+#multiple materials can share the same name but have different ID's
+save_material(project, "Cement", "50", "2")
+assert_equal(len(project.materials), 2)
+assert_equal(project.materials[0].material_id, 1)
+assert_equal(project.materials[1].material_id, 2)
+assert_equal(project.materials[0].name, "Cement")
+assert_equal(project.materials[1].name, "Cement")
+
+#Removing material by its ID
+remove_material(project, 2)
+assert_equal(len(project.materials), 1)
+assert_equal(project.materials[0].material_id, 1)
+assert_equal(total_expenses(project.materials), 600.0)
+
+#Bad project inputs
+invalid_project = State()
+save_project(invalid_project, "", "1000")
+assert_equal(invalid_project.project_name, "")
+save_project(invalid_project, "Library", "a")
+assert_equal(invalid_project.project_name, "")
+
+print("Finished running all unit tests!")
+
+
