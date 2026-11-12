@@ -13,8 +13,7 @@ set_site_information(
     sources = "Drafter documentaion and assistance from ChatGPT (see AI transcripts in repository)",
     planning = "See brainstorm/ and design/ folders in GitHub repository.",
     links = ["https://cafaith28.github.io/Budget-Project-Tracker/",
-             "https://github.com/cafaith28",
-             "https://github.com/cafaith28/Budget-Project-Tracker Repository"],
+        ],
     )
 
 @dataclass
